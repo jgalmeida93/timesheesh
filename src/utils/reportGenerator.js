@@ -4,6 +4,8 @@ const PDFDocument = require("pdfkit");
 const timesheetRepository = require("../repositories/timesheetRepository");
 const userRepository = require("../repositories/userRepository");
 
+const HOURLY_RATE = 45.0;
+
 async function generateMonthlyReport(userId, year, month) {
   const parsedYear = parseInt(year);
   const parsedMonth = parseInt(month);
@@ -25,6 +27,7 @@ async function generateMonthlyReport(userId, year, month) {
   );
 
   const totalHours = entries.reduce((sum, entry) => sum + entry.hours, 0);
+  const totalEarnings = totalHours * HOURLY_RATE;
 
   const projectSummary = entries.reduce((acc, entry) => {
     const projectName = entry.project.name;
@@ -34,6 +37,11 @@ async function generateMonthlyReport(userId, year, month) {
     acc[projectName] += entry.hours;
     return acc;
   }, {});
+
+  const projectEarnings = {};
+  Object.entries(projectSummary).forEach(([project, hours]) => {
+    projectEarnings[project] = hours * HOURLY_RATE;
+  });
 
   const reportsDir = path.join(__dirname, "../../reports");
   if (!fs.existsSync(reportsDir)) {
@@ -66,6 +74,10 @@ async function generateMonthlyReport(userId, year, month) {
 
   doc.pipe(writeStream);
 
+  const formatCurrency = (value) => {
+    return `R$ ${value.toFixed(2).replace(".", ",")}`;
+  };
+
   doc
     .fontSize(20)
     .font("Helvetica-Bold")
@@ -80,6 +92,8 @@ async function generateMonthlyReport(userId, year, month) {
     .text(`User: ${user.name || user.phone}`)
     .text(`Period: ${monthNames[parsedMonth - 1]} ${parsedYear}`)
     .text(`Total Hours: ${totalHours}`)
+    .text(`Hourly Rate: ${formatCurrency(HOURLY_RATE)}`)
+    .text(`Total Earnings: ${formatCurrency(totalEarnings)}`)
     .moveDown(1);
 
   doc
@@ -90,12 +104,17 @@ async function generateMonthlyReport(userId, year, month) {
 
   const projectCol = {
     x: 50,
-    width: 250,
+    width: 200,
   };
 
   const hoursCol = {
+    x: 260,
+    width: 80,
+  };
+
+  const earningsCol = {
     x: 350,
-    width: 100,
+    width: 120,
   };
 
   const projectTableTop = doc.y;
@@ -104,7 +123,8 @@ async function generateMonthlyReport(userId, year, month) {
     .fontSize(12)
     .font("Helvetica-Bold")
     .text("Project", projectCol.x, projectTableTop)
-    .text("Hours", hoursCol.x, projectTableTop);
+    .text("Hours", hoursCol.x, projectTableTop)
+    .text("Earnings", earningsCol.x, projectTableTop);
 
   doc
     .moveTo(50, projectTableTop + 20)
@@ -114,11 +134,14 @@ async function generateMonthlyReport(userId, year, month) {
   let projectTableY = projectTableTop + 30;
 
   Object.entries(projectSummary).forEach(([project, hours], index) => {
+    const earnings = projectEarnings[project];
+
     doc
       .fontSize(12)
       .font("Helvetica")
       .text(project, projectCol.x, projectTableY, { width: projectCol.width })
-      .text(hours.toString(), hoursCol.x, projectTableY);
+      .text(hours.toString(), hoursCol.x, projectTableY)
+      .text(formatCurrency(earnings), earningsCol.x, projectTableY);
 
     projectTableY += 25;
   });
@@ -131,13 +154,28 @@ async function generateMonthlyReport(userId, year, month) {
     .fontSize(12)
     .font("Helvetica-Bold")
     .text("Total", projectCol.x, projectTableY)
-    .text(totalHours.toString(), hoursCol.x, projectTableY);
+    .text(totalHours.toString(), hoursCol.x, projectTableY)
+    .text(formatCurrency(totalEarnings), earningsCol.x, projectTableY);
 
   doc.moveDown(2);
 
   if (doc.y > 500) {
     doc.addPage();
   }
+
+  doc
+    .fontSize(16)
+    .font("Helvetica-Bold")
+    .text("Financial Summary", { underline: true })
+    .moveDown(0.5);
+
+  doc
+    .fontSize(12)
+    .font("Helvetica")
+    .text(`Hourly Rate: ${formatCurrency(HOURLY_RATE)}`)
+    .text(`Total Hours: ${totalHours}`)
+    .text(`Total Earnings: ${formatCurrency(totalEarnings)}`)
+    .moveDown(1);
 
   doc
     .fontSize(16)
@@ -157,12 +195,17 @@ async function generateMonthlyReport(userId, year, month) {
 
   const entryHoursCol = {
     x: 320,
+    width: 60,
+  };
+
+  const entryEarningsCol = {
+    x: 390,
     width: 80,
   };
 
   const notesCol = {
-    x: 410,
-    width: 140,
+    x: 480,
+    width: 70,
   };
 
   const entriesTableTop = doc.y;
@@ -173,6 +216,7 @@ async function generateMonthlyReport(userId, year, month) {
     .text("Date", dateCol.x, entriesTableTop)
     .text("Project", entryProjectCol.x, entriesTableTop)
     .text("Hours", entryHoursCol.x, entriesTableTop)
+    .text("Earnings", entryEarningsCol.x, entriesTableTop)
     .text("Notes", notesCol.x, entriesTableTop);
 
   doc
@@ -193,6 +237,7 @@ async function generateMonthlyReport(userId, year, month) {
         .text("Date", dateCol.x, entriesTableY)
         .text("Project", entryProjectCol.x, entriesTableY)
         .text("Hours", entryHoursCol.x, entriesTableY)
+        .text("Earnings", entryEarningsCol.x, entriesTableY)
         .text("Notes", notesCol.x, entriesTableY);
 
       doc
@@ -204,6 +249,7 @@ async function generateMonthlyReport(userId, year, month) {
     }
 
     const dateStr = entry.date.toLocaleDateString();
+    const entryEarnings = entry.hours * HOURLY_RATE;
 
     doc
       .fontSize(12)
@@ -214,6 +260,9 @@ async function generateMonthlyReport(userId, year, month) {
       })
       .text(entry.hours.toString(), entryHoursCol.x, entriesTableY, {
         width: entryHoursCol.width,
+      })
+      .text(formatCurrency(entryEarnings), entryEarningsCol.x, entriesTableY, {
+        width: entryEarningsCol.width,
       })
       .text(entry.notes || "", notesCol.x, entriesTableY, {
         width: notesCol.width,
@@ -230,7 +279,8 @@ async function generateMonthlyReport(userId, year, month) {
     .fontSize(12)
     .font("Helvetica-Bold")
     .text("Total", dateCol.x, entriesTableY)
-    .text(totalHours.toString(), entryHoursCol.x, entriesTableY);
+    .text(totalHours.toString(), entryHoursCol.x, entriesTableY)
+    .text(formatCurrency(totalEarnings), entryEarningsCol.x, entriesTableY);
 
   doc.end();
 
