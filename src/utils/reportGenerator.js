@@ -6,6 +6,13 @@ const timesheetRepository = require("../repositories/timesheetRepository");
 const userRepository = require("../repositories/userRepository");
 
 async function generateMonthlyReport(userId, year, month) {
+  const parsedYear = parseInt(year);
+  const parsedMonth = parseInt(month);
+
+  if (isNaN(parsedYear) || isNaN(parsedMonth)) {
+    throw new Error(`Invalid year or month: year=${year}, month=${month}`);
+  }
+
   const user = await userRepository.findById(userId);
 
   if (!user) {
@@ -14,8 +21,8 @@ async function generateMonthlyReport(userId, year, month) {
 
   const entries = await timesheetRepository.getMonthlyReport(
     userId,
-    year,
-    month
+    parsedYear,
+    parsedMonth
   );
 
   const totalHours = entries.reduce((sum, entry) => sum + entry.hours, 0);
@@ -53,7 +60,7 @@ async function generateMonthlyReport(userId, year, month) {
     <!DOCTYPE html>
     <html>
     <head>
-      <title>Timesheet Report - ${monthNames[month - 1]} ${year}</title>
+      <title>Timesheet Report - ${monthNames[parsedMonth - 1]} ${parsedYear}</title>
       <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         h1, h2 { color: #333; }
@@ -69,7 +76,10 @@ async function generateMonthlyReport(userId, year, month) {
 </body>
 </html>`;
 
-  const reportPath = path.join(reportsDir, `${year}-${month}-report.html`);
+  const reportPath = path.join(
+    reportsDir,
+    `${parsedYear}-${parsedMonth}-report.html`
+  );
   fs.writeFileSync(reportPath, html);
   return reportPath;
 }

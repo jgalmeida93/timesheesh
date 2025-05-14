@@ -55,7 +55,25 @@ class TimesheetController {
   async downloadMonthlyReport(req, res, next) {
     try {
       const { year, month } = req.query;
-      const reportPath = await generateMonthlyReport(req.user.id, year, month);
+
+      if (!year || !month) {
+        return res.status(400).json({ error: "Year and month are required" });
+      }
+
+      const parsedYear = parseInt(year);
+      const parsedMonth = parseInt(month);
+
+      if (isNaN(parsedYear) || isNaN(parsedMonth)) {
+        return res
+          .status(400)
+          .json({ error: "Year and month must be valid numbers" });
+      }
+
+      const reportPath = await generateMonthlyReport(
+        req.user.id,
+        parsedYear,
+        parsedMonth
+      );
       res.download(reportPath);
     } catch (error) {
       next(error);

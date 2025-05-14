@@ -45,8 +45,21 @@ class TimesheetRepository {
   }
 
   async getMonthlyReport(userId, year, month) {
-    const startDate = new Date(parseInt(year), parseInt(month) - 1, 1);
-    const endDate = new Date(parseInt(year), parseInt(month), 0);
+    const parsedYear = parseInt(year);
+    const parsedMonth = parseInt(month);
+
+    if (isNaN(parsedYear) || isNaN(parsedMonth)) {
+      throw new Error(`Invalid year or month: year=${year}, month=${month}`);
+    }
+
+    const startDate = new Date(parsedYear, parsedMonth - 1, 1);
+    const endDate = new Date(parsedYear, parsedMonth, 0);
+
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      throw new Error(
+        `Invalid date range: startDate=${startDate}, endDate=${endDate}`
+      );
+    }
 
     return await prisma.timesheet.findMany({
       where: {

@@ -66,7 +66,6 @@ class TimesheetService {
   }
 
   async deleteEntry(userId, entryId) {
-    // Check if entry exists and belongs to the user
     const entry = await timesheetRepository.findById(entryId, userId);
 
     if (!entry) {
