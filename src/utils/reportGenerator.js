@@ -1,5 +1,7 @@
 const fs = require("fs");
 const path = require("path");
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 const timesheetRepository = require("../repositories/timesheetRepository");
 const userRepository = require("../repositories/userRepository");
 
@@ -13,7 +15,7 @@ async function generateMonthlyReport(userId, year, month) {
   const entries = await timesheetRepository.getMonthlyReport(
     userId,
     year,
-    month,
+    month
   );
 
   const totalHours = entries.reduce((sum, entry) => sum + entry.hours, 0);
@@ -71,3 +73,5 @@ async function generateMonthlyReport(userId, year, month) {
   fs.writeFileSync(reportPath, html);
   return reportPath;
 }
+
+module.exports = { generateMonthlyReport };

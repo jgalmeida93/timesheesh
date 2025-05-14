@@ -1,5 +1,5 @@
 const timesheetService = require("../services/timesheetService");
-const { generateMonthlyReport } = require("../utils/reportGenerator");
+const { generateMonthlyReport } = require("../reports");
 
 class TimesheetController {
   async getTimesheet(req, res, next) {
@@ -40,7 +40,7 @@ class TimesheetController {
       const report = await timesheetService.getMonthlyReport(
         req.user.id,
         year,
-        month,
+        month
       );
       res.json(report);
     } catch (error) {
@@ -59,6 +59,20 @@ class TimesheetController {
       res.download(reportPath);
     } catch (error) {
       next(error);
+    }
+  }
+
+  async deleteEntry(req, res, next) {
+    try {
+      const { id } = req.params;
+      const result = await timesheetService.deleteEntry(req.user.id, id);
+      res.json(result);
+    } catch (error) {
+      if (error.message.includes("not found")) {
+        res.status(404).json({ error: error.message });
+      } else {
+        next(error);
+      }
     }
   }
 }

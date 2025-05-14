@@ -32,7 +32,7 @@ class TimesheetService {
     const entries = await timesheetRepository.getMonthlyReport(
       userId,
       year,
-      month,
+      month
     );
 
     const totalHours = entries.reduce((sum, entry) => sum + entry.hours, 0);
@@ -63,6 +63,20 @@ class TimesheetService {
       dailySummary,
       entries,
     };
+  }
+
+  async deleteEntry(userId, entryId) {
+    // Check if entry exists and belongs to the user
+    const entry = await timesheetRepository.findById(entryId, userId);
+
+    if (!entry) {
+      throw new Error(
+        "Timesheet entry not found or you don't have permission to delete it"
+      );
+    }
+
+    await timesheetRepository.deleteEntry(entryId);
+    return { message: "Timesheet entry deleted successfully" };
   }
 }
 

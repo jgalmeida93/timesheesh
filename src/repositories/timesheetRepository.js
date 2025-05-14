@@ -64,6 +64,21 @@ class TimesheetRepository {
       },
     });
   }
+
+  async deleteEntry(id) {
+    return await prisma.timesheet.delete({
+      where: { id: parseInt(id) },
+    });
+  }
+
+  async findById(id, userId) {
+    return await prisma.timesheet.findFirst({
+      where: {
+        id: parseInt(id),
+        userId: userId ? parseInt(userId) : undefined,
+      },
+    });
+  }
 }
 
 module.exports = new TimesheetRepository();

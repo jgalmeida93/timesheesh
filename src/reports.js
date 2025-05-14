@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { PrismaClient } = require("@prisma/client");
+const { generateMonthlyReport } = require("./utils/reportGenerator");
 
 const prisma = new PrismaClient();
 
@@ -97,7 +98,7 @@ async function generateMonthlyReport(userId, year, month) {
             <td>${project}</td>
             <td>${hours}</td>
           </tr>
-        `,
+        `
           )
           .join("")}
         <tr class="total">
@@ -123,7 +124,7 @@ async function generateMonthlyReport(userId, year, month) {
             <td>${entry.hours}</td>
             <td>${entry.notes || ""}</td>
           </tr>
-        `,
+        `
           )
           .join("")}
         <tr class="total">
