@@ -9,7 +9,10 @@ class ProjectRepository {
     return await prisma.project.findFirst({
       where: {
         userId,
-        name,
+        name: {
+          equals: name,
+          mode: "insensitive",
+        },
       },
     });
   }
@@ -17,6 +20,9 @@ class ProjectRepository {
   async findByUser(userId) {
     return await prisma.project.findMany({
       where: { userId },
+      orderBy: {
+        name: "asc",
+      },
     });
   }
 
