@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/jgalmeida93/timesheesh/compare/v1.0.0...v1.1.0) (2025-05-29)
+
+
+### Features
+
+* enhance webhook service with project listing and help command responses ([d5780dc](https://github.com/jgalmeida93/timesheesh/commit/d5780dc35dc31c24acf1ce917740edefd3632230))
+* update project repository queries to support case-insensitive name matching and sort results by name ([2c02072](https://github.com/jgalmeida93/timesheesh/commit/2c02072147da752673e5193b1a341eac59be4019))
+
 ## 1.0.0 (2025-05-29)
 
 
