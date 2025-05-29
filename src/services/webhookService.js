@@ -11,7 +11,38 @@ class WebhookService {
 
     if (!user) {
       return this.createTwimlResponse(
-        "❌ You need to register first. Please visit our website to create an account.",
+        "❌ You need to register first. Please visit our website to create an account."
+      );
+    }
+
+    if (
+      body.toLowerCase() === "projects" ||
+      body.toLowerCase() === "list projects"
+    ) {
+      const projects = await projectRepository.findByUser(user.id);
+
+      if (projects.length === 0) {
+        return this.createTwimlResponse(
+          "❌ You don't have any projects yet. Please create a project first on the website."
+        );
+      }
+
+      const projectList = projects
+        .map((project) => `• ${project.name}`)
+        .join("\n");
+
+      return this.createTwimlResponse(
+        `📋 Your Projects:\n${projectList}\n\nTo log hours, send: "2hrs ProjectName" or "2hrs ProjectName DD/MM"`
+      );
+    }
+
+    if (body.toLowerCase() === "help" || body.toLowerCase() === "?") {
+      return this.createTwimlResponse(
+        `📱 Available Commands:
+• "2hrs ProjectName" - Log hours for today
+• "2hrs ProjectName DD/MM" - Log hours for a specific date
+• "projects" - List all your projects
+• "help" - Show this help message`
       );
     }
 
@@ -19,7 +50,7 @@ class WebhookService {
 
     if (!hoursMatch) {
       return this.createTwimlResponse(
-        '❌ Please send your hours in the format "2hrs ProjectName" or "2hrs ProjectName DD/MM".',
+        '❌ Please send your hours in the format "2hrs ProjectName" or "2hrs ProjectName DD/MM".'
       );
     }
 
@@ -44,7 +75,7 @@ class WebhookService {
 
       if (isNaN(entryDate.getTime()) || entryDate > new Date()) {
         return this.createTwimlResponse(
-          '❌ Invalid date. Please use format "DD/MM" or "DD/MM/YYYY".',
+          '❌ Invalid date. Please use format "DD/MM" or "DD/MM/YYYY".'
         );
       }
 
@@ -55,18 +86,18 @@ class WebhookService {
 
     if (!projectName) {
       return this.createTwimlResponse(
-        '❌ Please specify a project name: "2hrs ProjectName" or "2hrs ProjectName DD/MM"',
+        '❌ Please specify a project name: "2hrs ProjectName" or "2hrs ProjectName DD/MM"'
       );
     }
 
     const project = await projectRepository.findByUserAndName(
       user.id,
-      projectName,
+      projectName
     );
 
     if (!project) {
       return this.createTwimlResponse(
-        `❌ Project "${projectName}" does not exist. Please create it first on the website.`,
+        `❌ Project "${projectName}" does not exist. Please create it first on the website.`
       );
     }
 
@@ -82,11 +113,11 @@ class WebhookService {
 
     if (entryDate.toDateString() === new Date().toDateString()) {
       return this.createTwimlResponse(
-        `✅ Added ${hours} hours to project "${projectName}" for today.`,
+        `✅ Added ${hours} hours to project "${projectName}" for today.`
       );
     } else {
       return this.createTwimlResponse(
-        `✅ Added ${hours} hours to project "${projectName}" for ${formattedDate}.`,
+        `✅ Added ${hours} hours to project "${projectName}" for ${formattedDate}.`
       );
     }
   }
