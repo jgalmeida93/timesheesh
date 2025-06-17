@@ -1,3 +1,6 @@
+const prisma = require("../lib/prisma");
+const logger = require("../observability/logger");
+
 class ProjectRepository {
   async findById(id) {
     return await prisma.project.findUnique({
@@ -6,15 +9,36 @@ class ProjectRepository {
   }
 
   async findByUserAndName(userId, name) {
-    return await prisma.project.findFirst({
-      where: {
-        userId,
-        name: {
-          equals: name,
-          mode: "insensitive",
+    logger.debug(
+      `Repository: Finding project for user ${userId} with name "${name}"`
+    );
+
+    try {
+      const project = await prisma.project.findFirst({
+        where: {
+          userId,
+          name: {
+            equals: name,
+            mode: "insensitive",
+          },
         },
-      },
-    });
+      });
+
+      if (project) {
+        logger.debug(
+          `Repository: Found project ${project.id} with name "${project.name}"`
+        );
+      } else {
+        logger.debug(
+          `Repository: No project found with name "${name}" for user ${userId}`
+        );
+      }
+
+      return project;
+    } catch (error) {
+      logger.error(`Repository: Error finding project: ${error.message}`);
+      throw error;
+    }
   }
 
   async findByUser(userId) {
