@@ -1,3 +1,5 @@
+const prisma = require("../lib/prisma");
+
 class TimesheetRepository {
   async findById(id) {
     return await prisma.timesheet.findUnique({

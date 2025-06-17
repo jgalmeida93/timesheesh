@@ -1,3 +1,5 @@
+const prisma = require("../lib/prisma");
+
 class UserRepository {
   async findByEmail(email) {
     return await prisma.user.findUnique({

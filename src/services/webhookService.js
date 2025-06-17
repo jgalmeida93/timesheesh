@@ -103,6 +103,15 @@ class WebhookService {
       );
     }
 
+    logger.debug(
+      `Looking for project with name: "${projectName}" for user ${user.id}`
+    );
+
+    const allUserProjects = await projectRepository.findByUser(user.id);
+    logger.debug(
+      `User has ${allUserProjects.length} projects: ${allUserProjects.map((p) => `"${p.name}"`).join(", ")}`
+    );
+
     const project = await projectRepository.findByUserAndName(
       user.id,
       projectName
