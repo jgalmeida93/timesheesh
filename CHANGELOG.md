@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/jgalmeida93/timesheesh/compare/v1.1.0...v1.2.0) (2025-06-17)
+
+
+### Features
+
+* integrate winston for logging and enhance controllers with logging functionality ([12679c0](https://github.com/jgalmeida93/timesheesh/commit/12679c05852f95233515586a8950bec3718de7a8))
+
 ## [1.1.0](https://github.com/jgalmeida93/timesheesh/compare/v1.0.0...v1.1.0) (2025-05-29)
 
 
