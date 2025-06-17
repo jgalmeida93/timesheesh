@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/jgalmeida93/timesheesh/compare/v1.2.0...v1.2.1) (2025-06-17)
+
+
+### Bug Fixes
+
+* update project name matching to be case-insensitive ([a35c46d](https://github.com/jgalmeida93/timesheesh/commit/a35c46d9171cfcf947d85d48b17378dee68bdf69))
+
 ## [1.2.0](https://github.com/jgalmeida93/timesheesh/compare/v1.1.0...v1.2.0) (2025-06-17)
 
 
