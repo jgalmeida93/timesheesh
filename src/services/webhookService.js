@@ -47,10 +47,10 @@ class WebhookService {
       logger.info(`User ${user.id} requested help menu`);
       return this.createTwimlResponse(
         `📱 Available Commands:
-• "2hrs ProjectName" - Log hours for today
-• "2hrs ProjectName DD/MM" - Log hours for a specific date
-• "projects" - List all your projects
-• "help" - Show this help message`
+          • "2hrs ProjectName" - Log hours for today
+          • "2hrs ProjectName DD/MM" - Log hours for a specific date
+          • "projects" - List all your projects
+          • "help" - Show this help message`
       );
     }
 
