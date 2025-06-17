@@ -13,12 +13,14 @@ class ProjectRepository {
       `Repository: Finding project for user ${userId} with name "${name}"`
     );
 
+    const nameToLower = name.toLowerCase();
+
     try {
       const project = await prisma.project.findFirst({
         where: {
           userId,
           name: {
-            equals: name,
+            equals: nameToLower,
           },
         },
       });
