@@ -19,7 +19,6 @@ class ProjectRepository {
           userId,
           name: {
             equals: name,
-            mode: "insensitive",
           },
         },
       });
