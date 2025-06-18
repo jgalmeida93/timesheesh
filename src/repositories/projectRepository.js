@@ -16,14 +16,15 @@ class ProjectRepository {
     const nameToLower = name.toLowerCase();
 
     try {
-      const project = await prisma.project.findFirst({
+      const projects = await prisma.project.findMany({
         where: {
           userId,
-          name: {
-            equals: nameToLower,
-          },
         },
       });
+
+      const project = projects.find(
+        (p) => p.name.toLowerCase() === nameToLower
+      );
 
       if (project) {
         logger.debug(
