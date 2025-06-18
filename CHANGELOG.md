@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2](https://github.com/jgalmeida93/timesheesh/compare/v1.2.1...v1.2.2) (2025-06-18)
+
+
+### Bug Fixes
+
+* update project retrieval to use findMany and ensure case-insensitive name matching ([76c7396](https://github.com/jgalmeida93/timesheesh/commit/76c73962199865bbf0e6ede89573d66b80812f4c))
+
 ## [1.2.1](https://github.com/jgalmeida93/timesheesh/compare/v1.2.0...v1.2.1) (2025-06-17)
 
 
