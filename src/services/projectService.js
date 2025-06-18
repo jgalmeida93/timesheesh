@@ -7,7 +7,7 @@ class ProjectService {
 
   async createProject(userId, name) {
     return await projectRepository.create({
-      name,
+      name: name.toLowerCase(),
       userId,
     });
   }
