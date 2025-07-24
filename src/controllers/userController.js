@@ -33,6 +33,15 @@ class UserController {
     }
   }
 
+  async getDashboardStats(req, res, next) {
+    try {
+      const stats = await userService.getDashboardStats(req.user.id);
+      res.json(stats);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async updateUser(req, res, next) {
     try {
       const { id } = req.params;
@@ -53,7 +62,7 @@ class UserController {
       const userData = req.body;
       const updatedUser = await userService.updateProfile(
         req.user.id,
-        userData,
+        userData
       );
       res.json(updatedUser);
     } catch (error) {

@@ -27,6 +27,30 @@ class TimesheetController {
     }
   }
 
+  async getEntryById(req, res, next) {
+    try {
+      const { id } = req.params;
+      logger.info(`User ${req.user.id} requested timesheet entry ${id}`);
+
+      const entry = await timesheetService.getEntryById(
+        req.user.id,
+        parseInt(id)
+      );
+
+      logger.debug(`Retrieved timesheet entry ${id} for user ${req.user.id}`);
+      res.json(entry);
+    } catch (error) {
+      logger.error(
+        `Error retrieving timesheet entry ${req.params.id} for user ${req.user.id}: ${error.message}`
+      );
+      if (error.message === "Timesheet entry not found") {
+        res.status(404).json({ error: error.message });
+      } else {
+        next(error);
+      }
+    }
+  }
+
   async createEntry(req, res, next) {
     try {
       const { projectId, date, hours, notes } = req.body;
@@ -50,6 +74,41 @@ class TimesheetController {
         `Error creating timesheet entry for user ${req.user.id}: ${error.message}`
       );
       if (error.message === "Project not found") {
+        res.status(404).json({ error: error.message });
+      } else {
+        next(error);
+      }
+    }
+  }
+
+  async updateEntry(req, res, next) {
+    try {
+      const { id } = req.params;
+      const { projectId, date, hours, notes } = req.body;
+      logger.info(`User ${req.user.id} updating timesheet entry ${id}`);
+
+      const updateData = {};
+      if (projectId !== undefined) updateData.projectId = parseInt(projectId);
+      if (date !== undefined) updateData.date = date;
+      if (hours !== undefined) updateData.hours = parseFloat(hours);
+      if (notes !== undefined) updateData.notes = notes;
+
+      const entry = await timesheetService.updateEntry(
+        req.user.id,
+        parseInt(id),
+        updateData
+      );
+
+      logger.info(`Updated timesheet entry ${id} for user ${req.user.id}`);
+      res.json(entry);
+    } catch (error) {
+      logger.error(
+        `Error updating timesheet entry ${req.params.id} for user ${req.user.id}: ${error.message}`
+      );
+      if (
+        error.message === "Timesheet entry not found" ||
+        error.message === "Project not found"
+      ) {
         res.status(404).json({ error: error.message });
       } else {
         next(error);

@@ -1,5 +1,7 @@
 const bcrypt = require("bcrypt");
 const userRepository = require("../repositories/userRepository");
+const projectRepository = require("../repositories/projectRepository");
+const timesheetRepository = require("../repositories/timesheetRepository");
 
 class UserService {
   async getAllUsers() {
@@ -14,6 +16,58 @@ class UserService {
     }
 
     return user;
+  }
+
+  async getDashboardStats(userId) {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1;
+
+    // Get total projects count
+    const projects = await projectRepository.findByUser(userId);
+    const totalProjects = projects.length;
+
+    // Get all timesheet entries for total hours
+    const allEntries = await timesheetRepository.findByUser(userId, {});
+    const totalHours = allEntries.reduce((sum, entry) => sum + entry.hours, 0);
+
+    // Get current month entries
+    const monthlyEntries = await timesheetRepository.getMonthlyReport(
+      userId,
+      currentYear,
+      currentMonth
+    );
+    const monthlyHours = monthlyEntries.reduce(
+      (sum, entry) => sum + entry.hours,
+      0
+    );
+
+    // Calculate monthly earnings
+    const monthlyEarnings = monthlyEntries.reduce((sum, entry) => {
+      return sum + entry.hours * (entry.project.hourlyRate || 0);
+    }, 0);
+
+    // Get recent projects (last 5)
+    const recentProjects = projects
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 5);
+
+    // Get recent time entries (last 10)
+    const recentEntries = allEntries
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      .slice(0, 10);
+
+    return {
+      totalProjects,
+      activeProjects: totalProjects, // For now, all projects are considered active
+      totalHours,
+      monthlyHours,
+      monthlyEarnings,
+      recentProjects,
+      recentEntries,
+      currentMonth: currentMonth,
+      currentYear: currentYear,
+    };
   }
 
   async updateUser(id, userData) {
@@ -47,7 +101,7 @@ class UserService {
 
       const validPassword = await bcrypt.compare(
         currentPassword,
-        user.password,
+        user.password
       );
 
       if (!validPassword) {

@@ -1,9 +1,15 @@
 const prisma = require("../lib/prisma");
 
 class TimesheetRepository {
-  async findById(id) {
-    return await prisma.timesheet.findUnique({
-      where: { id },
+  async findById(id, userId) {
+    return await prisma.timesheet.findFirst({
+      where: {
+        id: parseInt(id),
+        userId: userId ? parseInt(userId) : undefined,
+      },
+      include: {
+        project: true,
+      },
     });
   }
 
@@ -30,6 +36,9 @@ class TimesheetRepository {
   async create(timesheetData) {
     return await prisma.timesheet.create({
       data: timesheetData,
+      include: {
+        project: true,
+      },
     });
   }
 
@@ -37,6 +46,9 @@ class TimesheetRepository {
     return await prisma.timesheet.update({
       where: { id },
       data: timesheetData,
+      include: {
+        project: true,
+      },
     });
   }
 
@@ -83,15 +95,6 @@ class TimesheetRepository {
   async deleteEntry(id) {
     return await prisma.timesheet.delete({
       where: { id: parseInt(id) },
-    });
-  }
-
-  async findById(id, userId) {
-    return await prisma.timesheet.findFirst({
-      where: {
-        id: parseInt(id),
-        userId: userId ? parseInt(userId) : undefined,
-      },
     });
   }
 }

@@ -24,6 +24,8 @@ model User {
 model Project {
   id         Int        @id @default(autoincrement())
   name       String
+  hourlyRate Float      @default(0.0)
+  currency   String     @default("USD")
   userId     Int
   user       User       @relation(fields: [userId], references: [id])
   timesheet  Timesheet[]

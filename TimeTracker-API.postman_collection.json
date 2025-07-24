@@ -1,0 +1,503 @@
+{
+  "info": {
+    "_postman_id": "timetracker-api-collection",
+    "name": "TimeTracker Pro API",
+    "description": "Complete API collection for TimeTracker Pro application with authentication, dashboard, projects, timesheet, and reports endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "timetracker-pro"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"+5511999999999\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            },
+            "description": "Register a new user account"
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('auth_token', response.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Login user and get authentication token"
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Management",
+      "item": [
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/me",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "me"]
+            },
+            "description": "Get current authenticated user information"
+          }
+        },
+        {
+          "name": "Get Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/users/me/dashboard",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "me", "dashboard"]
+            },
+            "description": "Get dashboard statistics including total projects, hours, earnings, and recent activity"
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Updated\",\n  \"email\": \"john.updated@example.com\",\n  \"phone\": \"+5511999999998\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/users/me/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "me", "profile"]
+            },
+            "description": "Update current user profile information"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Project Management",
+      "item": [
+        {
+          "name": "Get All Projects",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/projects",
+              "host": ["{{base_url}}"],
+              "path": ["api", "projects"]
+            },
+            "description": "Get all projects for the authenticated user"
+          }
+        },
+        {
+          "name": "Create Project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('project_id', response.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pagday\",\n  \"hourlyRate\": 45.0,\n  \"currency\": \"BRL\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/projects",
+              "host": ["{{base_url}}"],
+              "path": ["api", "projects"]
+            },
+            "description": "Create a new project with name, hourly rate, and currency"
+          }
+        },
+        {
+          "name": "Get Project by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/projects/{{project_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "projects", "{{project_id}}"]
+            },
+            "description": "Get specific project details by ID"
+          }
+        },
+        {
+          "name": "Update Project",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Pagday Updated\",\n  \"hourlyRate\": 50.0,\n  \"currency\": \"USD\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/projects/{{project_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "projects", "{{project_id}}"]
+            },
+            "description": "Update project name, hourly rate, or currency"
+          }
+        },
+        {
+          "name": "Delete Project",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/projects/{{project_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "projects", "{{project_id}}"]
+            },
+            "description": "Delete a project (will also delete all associated timesheet entries)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Time Tracking",
+      "item": [
+        {
+          "name": "Get All Time Entries",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/timesheet",
+              "host": ["{{base_url}}"],
+              "path": ["api", "timesheet"]
+            },
+            "description": "Get all timesheet entries for the authenticated user"
+          }
+        },
+        {
+          "name": "Get Time Entries with Date Filter",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/timesheet?startDate=2025-07-01&endDate=2025-07-31",
+              "host": ["{{base_url}}"],
+              "path": ["api", "timesheet"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2025-07-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2025-07-31"
+                }
+              ]
+            },
+            "description": "Get timesheet entries filtered by date range"
+          }
+        },
+        {
+          "name": "Create Time Entry",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('timesheet_id', response.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": {{project_id}},\n  \"date\": \"2025-07-24\",\n  \"hours\": 2.0,\n  \"notes\": \"Working on project features\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/timesheet",
+              "host": ["{{base_url}}"],
+              "path": ["api", "timesheet"]
+            },
+            "description": "Create a new time entry for a project"
+          }
+        },
+        {
+          "name": "Get Time Entry by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/timesheet/{{timesheet_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "timesheet", "{{timesheet_id}}"]
+            },
+            "description": "Get specific time entry details by ID"
+          }
+        },
+        {
+          "name": "Update Time Entry",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectId\": {{project_id}},\n  \"date\": \"2025-07-24\",\n  \"hours\": 3.0,\n  \"notes\": \"Updated: Extended work on project features\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/timesheet/{{timesheet_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "timesheet", "{{timesheet_id}}"]
+            },
+            "description": "Update an existing time entry"
+          }
+        },
+        {
+          "name": "Delete Time Entry",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/timesheet/{{timesheet_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "timesheet", "{{timesheet_id}}"]
+            },
+            "description": "Delete a time entry"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Get Monthly Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reports/monthly?year=2025&month=7",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "monthly"],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2025"
+                },
+                {
+                  "key": "month",
+                  "value": "7"
+                }
+              ]
+            },
+            "description": "Get monthly report with project summaries and daily breakdowns"
+          }
+        },
+        {
+          "name": "Download Monthly Report PDF",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/reports/monthly/download?year=2025&month=7",
+              "host": ["{{base_url}}"],
+              "path": ["api", "reports", "monthly", "download"],
+              "query": [
+                {
+                  "key": "year",
+                  "value": "2025"
+                },
+                {
+                  "key": "month",
+                  "value": "7"
+                }
+              ]
+            },
+            "description": "Download monthly report as PDF file"
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:1234",
+      "type": "string"
+    }
+  ]
+}
