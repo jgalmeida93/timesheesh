@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/jgalmeida93/timesheesh/compare/v1.3.1...v1.4.0) (2025-07-24)
+
+
+### Features
+
+* add note formatting and adjust report layout in reportGenerator.js ([a7f85c6](https://github.com/jgalmeida93/timesheesh/commit/a7f85c6b688fd9835a2a59739bf0a33a05483e95))
+
 ## [1.3.1](https://github.com/jgalmeida93/timesheesh/compare/v1.3.0...v1.3.1) (2025-07-24)
 
 
