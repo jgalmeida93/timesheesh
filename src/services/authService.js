@@ -4,6 +4,13 @@ const userRepository = require("../repositories/userRepository");
 const logger = require("../observability/logger");
 
 class AuthService {
+  constructor() {
+    if (!process.env.JWT_SECRET) {
+      logger.error("JWT_SECRET environment variable is not defined!");
+      throw new Error("JWT_SECRET must be configured");
+    }
+  }
+
   async register(userData) {
     logger.debug(
       `Registering new user with email: ${userData.email}, phone: ${userData.phone}`
@@ -52,6 +59,11 @@ class AuthService {
     }
 
     logger.debug(`Password validated for user: ${email}`);
+
+    if (!process.env.JWT_SECRET) {
+      logger.error("JWT_SECRET is not defined when trying to sign token");
+      throw new Error("Server configuration error");
+    }
 
     const token = jwt.sign(
       { id: user.id, email: user.email },
