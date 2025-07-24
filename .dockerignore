@@ -4,4 +4,3 @@ logs
 *.log
 *.sqlite
 *.sqlite-journal
-.env
