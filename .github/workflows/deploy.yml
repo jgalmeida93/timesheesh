@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout do código
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.0
@@ -20,10 +20,12 @@ jobs:
           username: root
           key: ${{ secrets.DEPLOY_KEY }}
           script: |
-            cd timesheesh || git clone https://github.com/jgalmeida93/timesheesh.git /root/timesheesh
-            cd timesheesh
+            if [ ! -d "/root/timesheesh" ]; then
+              git clone https://github.com/jgalmeida93/timesheesh.git /root/timesheesh
+            fi
+            cd /root/timesheesh
             git pull origin main
             docker build -t timesheesh-backend .
             docker stop timesheesh-backend || true
             docker rm timesheesh-backend || true
-            docker run -d -p 1234:1234 --name timesheesh-backend timesheesh-backend
+            docker run -d -p 1234:1234 --name timesheesh-backend -v /root/timesheesh/data:/app/data timesheesh-backend
