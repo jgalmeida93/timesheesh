@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0](https://github.com/jgalmeida93/timesheesh/compare/v1.2.1...v1.3.0) (2025-07-24)
+
+
+### Features
+
+* add project hourly rate and currency fields, and more ([cf0812b](https://github.com/jgalmeida93/timesheesh/commit/cf0812b3cb4842f870bcfbe4d864b1a17ba78809))
+
+
+### Bug Fixes
+
+* update project retrieval to use findMany and ensure case-insensitive name matching ([76c7396](https://github.com/jgalmeida93/timesheesh/commit/76c73962199865bbf0e6ede89573d66b80812f4c))
+
 ## [1.2.1](https://github.com/jgalmeida93/timesheesh/compare/v1.2.0...v1.2.1) (2025-06-17)
 
 
