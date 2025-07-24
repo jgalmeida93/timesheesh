@@ -78,6 +78,11 @@ async function generateMonthlyReport(userId, year, month) {
     return `R$ ${value.toFixed(2).replace(".", ",")}`;
   };
 
+  const formatNotes = (notes) => {
+    if (!notes) return "";
+    return notes.replace(/\s+/g, " ").trim();
+  };
+
   doc
     .fontSize(20)
     .font("Helvetica-Bold")
@@ -185,27 +190,27 @@ async function generateMonthlyReport(userId, year, month) {
 
   const dateCol = {
     x: 50,
-    width: 100,
+    width: 90,
   };
 
   const entryProjectCol = {
-    x: 160,
-    width: 150,
+    x: 150,
+    width: 120,
   };
 
   const entryHoursCol = {
-    x: 320,
-    width: 60,
+    x: 280,
+    width: 50,
   };
 
   const entryEarningsCol = {
-    x: 390,
-    width: 80,
+    x: 340,
+    width: 70,
   };
 
   const notesCol = {
-    x: 480,
-    width: 70,
+    x: 420,
+    width: 130,
   };
 
   const entriesTableTop = doc.y;
@@ -227,7 +232,17 @@ async function generateMonthlyReport(userId, year, month) {
   let entriesTableY = entriesTableTop + 30;
 
   entries.forEach((entry, index) => {
-    if (entriesTableY > 750) {
+    const notesText = formatNotes(entry.notes);
+    const notesHeight = notesText
+      ? doc.heightOfString(notesText, {
+          width: notesCol.width,
+          align: "left",
+          lineGap: 2,
+        })
+      : 15;
+    const rowHeight = Math.max(25, notesHeight + 5);
+
+    if (entriesTableY + rowHeight > 750) {
       doc.addPage();
       entriesTableY = 50;
 
@@ -264,11 +279,13 @@ async function generateMonthlyReport(userId, year, month) {
       .text(formatCurrency(entryEarnings), entryEarningsCol.x, entriesTableY, {
         width: entryEarningsCol.width,
       })
-      .text(entry.notes || "", notesCol.x, entriesTableY, {
+      .text(notesText, notesCol.x, entriesTableY, {
         width: notesCol.width,
+        align: "left",
+        lineGap: 2,
       });
 
-    entriesTableY += 25;
+    entriesTableY += rowHeight;
   });
 
   doc.moveTo(50, entriesTableY).lineTo(550, entriesTableY).stroke();
