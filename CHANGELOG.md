@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/jgalmeida93/timesheesh/compare/v1.3.0...v1.3.1) (2025-07-24)
+
+
+### Bug Fixes
+
+* update DATABASE_URL path in deploy.yml for correct data storage location ([7111ebf](https://github.com/jgalmeida93/timesheesh/commit/7111ebf176e366191e99bb97478c7f79e32510c3))
+
 ## [1.3.0](https://github.com/jgalmeida93/timesheesh/compare/v1.2.1...v1.3.0) (2025-07-24)
 
 
