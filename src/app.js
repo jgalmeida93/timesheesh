@@ -9,7 +9,6 @@ const userRoutes = require("./routes/userRoutes");
 const projectRoutes = require("./routes/projectRoutes");
 const timesheetRoutes = require("./routes/timesheetRoutes");
 const reportRoutes = require("./routes/reportRoutes");
-const webhookRoutes = require("./routes/webhookRoutes");
 
 const app = express();
 
@@ -26,7 +25,6 @@ app.use("/api/users", userRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/timesheet", timesheetRoutes);
 app.use("/api/reports", reportRoutes);
-app.use("/webhook", webhookRoutes);
 
 app.use(errorHandler);
 

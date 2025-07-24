@@ -13,6 +13,16 @@ router.post(
   authenticateToken,
   timesheetController.createEntry.bind(timesheetController)
 );
+router.get(
+  "/:id",
+  authenticateToken,
+  timesheetController.getEntryById.bind(timesheetController)
+);
+router.put(
+  "/:id",
+  authenticateToken,
+  timesheetController.updateEntry.bind(timesheetController)
+);
 router.delete(
   "/:id",
   authenticateToken,

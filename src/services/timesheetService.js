@@ -14,6 +14,20 @@ class TimesheetService {
     return entries;
   }
 
+  async getEntryById(userId, entryId) {
+    logger.debug(`Fetching timesheet entry ${entryId} for user ${userId}`);
+
+    const entry = await timesheetRepository.findById(entryId, userId);
+
+    if (!entry) {
+      logger.warn(`Timesheet entry ${entryId} not found for user ${userId}`);
+      throw new Error("Timesheet entry not found");
+    }
+
+    logger.debug(`Retrieved timesheet entry ${entryId} for user ${userId}`);
+    return entry;
+  }
+
   async createEntry(userId, entryData) {
     const { projectId, date, hours, notes } = entryData;
     logger.debug(
@@ -48,6 +62,46 @@ class TimesheetService {
       `Created timesheet entry ${entry.id} for user ${userId}, project ${projectId}, ${hours} hours on ${date}`
     );
     return entry;
+  }
+
+  async updateEntry(userId, entryId, updateData) {
+    logger.debug(
+      `Updating timesheet entry ${entryId} for user ${userId}: ${JSON.stringify(updateData)}`
+    );
+
+    const entry = await timesheetRepository.findById(entryId, userId);
+
+    if (!entry) {
+      logger.warn(`Timesheet entry ${entryId} not found for user ${userId}`);
+      throw new Error("Timesheet entry not found");
+    }
+
+    if (updateData.projectId) {
+      const project = await projectRepository.findById(updateData.projectId);
+
+      if (!project) {
+        logger.warn(
+          `Project ${updateData.projectId} not found when updating timesheet entry ${entryId} for user ${userId}`
+        );
+        throw new Error("Project not found");
+      }
+
+      if (project.userId !== userId) {
+        logger.warn(
+          `User ${userId} attempted to update timesheet entry ${entryId} with project ${updateData.projectId} they don't own`
+        );
+        throw new Error("Project not found");
+      }
+    }
+
+    if (updateData.date) {
+      updateData.date = new Date(updateData.date);
+    }
+
+    const updatedEntry = await timesheetRepository.update(entryId, updateData);
+
+    logger.info(`Updated timesheet entry ${entryId} for user ${userId}`);
+    return updatedEntry;
   }
 
   async getMonthlyReport(userId, year, month) {
