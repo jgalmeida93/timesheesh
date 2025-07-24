@@ -23,9 +23,6 @@ RUN apt-get update -y && apt-get install -y openssl
 
 COPY --from=builder /app /app
 
-# 🔥 COPIA O .env PARA O CONTAINER
-COPY .env .env
-
 # Script de entrada
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
