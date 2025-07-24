@@ -20,6 +20,9 @@ jobs:
           username: root
           key: ${{ secrets.DEPLOY_KEY }}
           script: |
+            # Criar diretório persistente para dados se não existir
+            mkdir -p /var/lib/timesheesh/data
+
             if [ ! -d "/root/timesheesh" ]; then
               git clone https://github.com/jgalmeida93/timesheesh.git /root/timesheesh
             fi
@@ -31,7 +34,9 @@ jobs:
             docker run -d \
               -p 1234:1234 \
               --name timesheesh-backend \
-              -v /root/timesheesh/data:/app/data \
-              -e DATABASE_URL=${{ secrets.DATABASE_URL }} \
+              -v /var/lib/timesheesh/data:/app/data \
+              -e DATABASE_URL="file:./data/prod.db" \
               -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              -e NODE_ENV=production \
+              --restart unless-stopped \
               timesheesh-backend

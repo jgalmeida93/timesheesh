@@ -6,7 +6,11 @@ services:
     ports:
       - "1234:1234"
     volumes:
-      - ./data:/app/data
+      - timesheesh_data:/app/data
     environment:
       - NODE_ENV=production
-    restart: always
+      - DATABASE_URL=file:./data/prod.db
+    restart: unless-stopped
+
+volumes:
+  timesheesh_data:
