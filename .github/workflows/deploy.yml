@@ -20,23 +20,66 @@ jobs:
           username: root
           key: ${{ secrets.DEPLOY_KEY }}
           script: |
-            # Criar diretório persistente para dados se não existir
+            export JWT_SECRET=${{ secrets.JWT_SECRET }}
+            export DATABASE_URL="file:./data/prod.db"
+
+            echo "🔧 Criando diretório de dados persistente..."
             mkdir -p /var/lib/timesheesh/data
+            chmod 755 /var/lib/timesheesh/data
+
+            echo "📊 Verificando dados existentes..."
+            ls -la /var/lib/timesheesh/data/
+
+            # Backup automático antes do deploy
+            echo "💾 Criando backup antes do deploy..."
+            BACKUP_DIR="/var/lib/timesheesh/backups"
+            DB_PATH="/var/lib/timesheesh/data/prod.db"
+            TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+
+            mkdir -p "$BACKUP_DIR"
+            if [ -f "$DB_PATH" ]; then
+                cp "$DB_PATH" "$BACKUP_DIR/prod.db.backup.$TIMESTAMP"
+                echo "✅ Backup criado: $BACKUP_DIR/prod.db.backup.$TIMESTAMP"
+            else
+                echo "⚠️ Banco não encontrado para backup"
+            fi
 
             if [ ! -d "/root/timesheesh" ]; then
+              echo "📥 Clonando repositório..."
               git clone https://github.com/jgalmeida93/timesheesh.git /root/timesheesh
             fi
+
+            echo "🔄 Atualizando código..."
             cd /root/timesheesh
             git pull origin main
+
+            echo "🏗️ Construindo imagem Docker..."
             docker build -t timesheesh-backend .
+
+            echo "🛑 Parando container anterior..."
             docker stop timesheesh-backend || true
             docker rm timesheesh-backend || true
+
+            echo "🚀 Iniciando novo container com volume persistente..."
             docker run -d \
               -p 1234:1234 \
               --name timesheesh-backend \
               -v /var/lib/timesheesh/data:/app/data \
-              -e DATABASE_URL="file:./data/prod.db" \
-              -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+              -e DATABASE_URL="$DATABASE_URL" \
+              -e JWT_SECRET="$JWT_SECRET" \
               -e NODE_ENV=production \
               --restart unless-stopped \
               timesheesh-backend
+
+            echo "⏳ Aguardando container inicializar..."
+            sleep 10
+
+            echo "✅ Deploy concluído!"
+            echo "📊 Verificando logs do container..."
+            docker logs timesheesh-backend --tail 20
+
+            echo "🔍 Verificando se o banco está persistido..."
+            docker exec timesheesh-backend ls -la /app/data/
+
+            echo "📊 Verificando tamanho do banco..."
+            docker exec timesheesh-backend sh -c "if [ -f /app/data/prod.db ]; then echo 'Tamanho do banco:' \$(du -h /app/data/prod.db | cut -f1); else echo 'Banco não encontrado'; fi"

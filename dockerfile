@@ -29,6 +29,9 @@ RUN chmod +x /app/entrypoint.sh
 
 RUN mkdir -p /app/data
 
+# Define o volume para persistir os dados do banco
+VOLUME /app/data
+
 ENV NODE_ENV=production
 EXPOSE 1234
 

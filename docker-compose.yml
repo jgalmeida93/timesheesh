@@ -9,7 +9,7 @@ services:
       - timesheesh_data:/app/data
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=file:./data/prod.db
+      - DATABASE_URL=file:/app/data/prod.db
       - JWT_SECRET=local_development_jwt_secret_key_123
     restart: unless-stopped
 
