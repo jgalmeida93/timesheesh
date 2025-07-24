@@ -3,14 +3,14 @@ FROM node:20-slim AS builder
 
 WORKDIR /app
 
-# Copia somente os arquivos de dependência para melhor aproveitamento do cache
+# Instala dependências de sistema (incluindo OpenSSL)
+RUN apt-get update -y && apt-get install -y openssl
+
+# Instala dependências do projeto
 COPY package*.json ./
 RUN npm install
 
-# Copia o restante do projeto
 COPY . .
-
-# Gera os arquivos do Prisma Client
 RUN npx prisma generate
 
 # Etapa final (runtime)
@@ -18,15 +18,17 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# Copia apenas o que foi gerado na etapa de build
+# Instala dependências de sistema no container final também
+RUN apt-get update -y && apt-get install -y openssl
+
 COPY --from=builder /app /app
 
-# Garante que a pasta de dados exista (volume irá sobrescrever, mas evita erros de path)
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 RUN mkdir -p /app/data
 
-# Variáveis e porta
 ENV NODE_ENV=production
 EXPOSE 1234
 
 CMD ["/app/entrypoint.sh"]
-
