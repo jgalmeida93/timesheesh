@@ -36,7 +36,7 @@ jobs:
               --name timesheesh-backend \
               -v /var/lib/timesheesh/data:/app/data \
               -e DATABASE_URL="file:./data/prod.db" \
-              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              -e JWT_SECRET="${{ secrets.JWT_SECRET }}" \
               -e NODE_ENV=production \
               --restart unless-stopped \
               timesheesh-backend
